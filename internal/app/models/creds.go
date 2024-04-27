@@ -1,4 +1,4 @@
-package core
+package app
 
 import "gorm.io/gorm"
 
