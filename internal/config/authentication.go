@@ -49,6 +49,18 @@ var (
 
 // OAuth2 Apple
 var (
+	GithubOAuth2ClientID     = ut.Env("GITHUB_OAUTH2_CLIENT_ID", "")
+	GithubOAuth2ClientSecret = ut.Env("GITHUB_OAUTH2_CLIENT_SECRET", "")
+	GithubOAuth2RedirectURL  = ut.Env("GITHUB_OAUTH2_REDIRECT_URL", "https://localhost:8080/api/v2/auth/github/callback")
+	GithubOAuth2AuthURL      = ut.Env("GITHUB_OAUTH2_AUTH_URL", "https://www.github.com/auth/authorize")
+	GithubOAuth2TokenURL     = ut.Env("GITHUB_OAUTH2_TOKEN_URL", "https://www.github.com/auth/token")
+	GithubOAuth2Scope        = ut.Env("GITHUB_OAUTH2_SCOPE", "email name")
+	GithubOAuth2ResponseType = ut.Env("GITHUB_OAUTH2_RESPONSE_TYPE", "code")
+	GithubOAuth2UserinfoURL  = ut.Env("GITHUB_USERINFO_URL", "https://www.github.com/auth/token")
+)
+
+// OAuth2 Apple
+var (
 	AppleOAuth2ClientID     = ut.Env("APPLE_OAUTH2_CLIENT_ID", "")
 	AppleOAuth2ClientSecret = ut.Env("APPLE_OAUTH2_CLIENT_SECRET", "")
 	AppleOAuth2RedirectURL  = ut.Env("APPLE_OAUTH2_REDIRECT_URL", "https://localhost:8080/api/v2/auth/apple/callback")
@@ -56,5 +68,5 @@ var (
 	AppleOAuth2TokenURL     = ut.Env("APPLE_OAUTH2_TOKEN_URL", "https://appleid.apple.com/auth/token")
 	AppleOAuth2Scope        = ut.Env("APPLE_OAUTH2_SCOPE", "email name")
 	AppleOAuth2ResponseType = ut.Env("APPLE_OAUTH2_RESPONSE_TYPE", "code")
-	AppleUserinfoURL        = ut.Env("APPLE_USERINFO_URL", "https://appleid.apple.com/auth/token")
+	AppleOAuth2UserinfoURL  = ut.Env("APPLE_USERINFO_URL", "https://appleid.apple.com/auth/token")
 )
