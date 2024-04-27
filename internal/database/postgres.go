@@ -15,7 +15,7 @@ var DB *gorm.DB // Global database connection
 // InitDB initializes the database connection using the configuration values from the config package.
 // It establishes a connection to the PostgreSQL database and assigns the connection to the global DB variable.
 // If an error occurs during the connection process, it logs the error and shuts down the logger.
-func InitDB() {
+func Init() {
 	var err error
 
 	var dsn string = "host=" + config.PgHost + " port=" + config.PgPort + " user=" + config.PgUser + " dbname=" + config.Database + " sslmode=" + config.SSLMode + " password=" + config.PgPassword
