@@ -5,11 +5,20 @@ import (
 	"gorm.io/gorm"
 )
 
+type CredsEnvironment int
+
+const (
+	Development CredsEnvironment = iota
+	Staging
+	Preproduction
+	Production
+)
+
 type Credential struct {
 	gorm.Model
-	OrganizationID uint   `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null"`
-	EnvironmentID  uint   `json:"environment_id" form:"environment_id" query:"environment_id" gorm:"not null"`
-	Version        string `json:"version" form:"version" query:"version" gorm:"not null"`
+	OrganizationID uint             `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null"`
+	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null" binding:"oneof=0 1 2 3"`
+	Version        string           `json:"version" form:"version" query:"version" gorm:"not null"`
 }
 
 type CredentialField struct {

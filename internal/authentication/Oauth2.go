@@ -139,7 +139,6 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 			user.Email = email
 			user.DisplayName = userInfo["first_name"].(string)
 			user.OAuthID = userInfo["openid"].(string)
-			user.Role = models.Member
 
 			err := user.Register(user)
 			if err != nil {

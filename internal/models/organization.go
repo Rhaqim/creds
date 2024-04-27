@@ -14,9 +14,10 @@ const (
 
 type Organization struct {
 	gorm.Model
-	OwnerID          uint                  `json:"owner_id" form:"owner_id" query:"owner_id" gorm:"not null" binding:"required"`
+	CreatorID        uint                  `json:"creator_id" form:"creator_id" query:"creator_id" gorm:"not null" binding:"required"`
 	OrganizationName string                `json:"organization_name" form:"organization_name" query:"organization_name" gorm:"not null" binding:"required"`
 	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null" binding:"oneof=company personal"`
+	Members          []OrganizationMember  `json:"members" form:"members" query:"members" gorm:"foreignKey:OrganizationID"`
 }
 
 // Insert creates a new organization.
@@ -37,7 +38,7 @@ func (O *Organization) GetByOrganizationName(name string) error {
 // GetMultipleByUserID retrieves organizations by user ID.
 func (O Organization) GetMultipleByUserID(userID int) ([]Organization, error) {
 	var orgs []Organization
-	err := database.DB.Where("owner_id = ?", userID).Find(&orgs).Error
+	err := database.DB.Where("creator_id = ?", userID).Find(&orgs).Error
 	return orgs, err
 }
 
@@ -52,7 +53,24 @@ func (O *Organization) Delete() error {
 }
 
 func (O *Organization) CreateOrganization(user User) error {
-	O.OwnerID = user.ID
+	var err error
+	var member OrganizationMember
 
-	return O.Insert()
+	O.CreatorID = user.ID
+
+	err = O.Insert()
+	if err != nil {
+		return err
+	}
+
+	member.OrganizationID = O.ID
+	member.UserID = user.ID
+	member.Role = Admin
+
+	err = member.Insert()
+	if err != nil {
+		return err
+	}
+
+	return err
 }

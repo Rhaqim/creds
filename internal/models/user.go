@@ -5,21 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRole string
-
-const (
-	Admin  UserRole = "admin"
-	Member UserRole = "member"
-)
-
 type User struct {
 	gorm.Model
-	DisplayName    string   `json:"display_name" binding:"required"`
-	Email          string   `json:"email" gorm:"unique" binding:"required"`
-	OAuthID        string   `json:"oauth_id" gorm:"unique" binding:"required"`
-	OrganizationID uint     `json:"organization_id,omitempty"`
-	Role           UserRole `json:"role" binding:"required"`
-	RefreshToken   string   `json:"refresh_token,omitempty"`
+	DisplayName    string `json:"display_name" binding:"required"`
+	Email          string `json:"email" gorm:"unique" binding:"required"`
+	OAuthID        string `json:"oauth_id" gorm:"unique" binding:"required"`
+	OrganizationID uint   `json:"organization_id,omitempty"`
+	RefreshToken   string `json:"refresh_token,omitempty"`
 }
 
 // Insert creates a new organization.
