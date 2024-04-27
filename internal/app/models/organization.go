@@ -19,41 +19,29 @@ type Organization struct {
 	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null"`
 }
 
-// OrganizationService is a service that provides operations on organizations.
-type OrganizationService struct {
-	db *gorm.DB
+// Insert creates a new organization.
+func (O *Organization) Insert() error {
+	return database.DB.Model(O).Create(O).Error
 }
 
-// NewOrganizationService creates a new organization service.
-func NewOrganizationService() *OrganizationService {
-	return &OrganizationService{db: database.DB}
+// GetnByID retrieves an organization by its ID.
+func (O *Organization) GetByID(id int) error {
+	return database.DB.Where("id = ?", id).First(O).Error
 }
 
-// CreateOrganization creates a new organization.
-func (s *OrganizationService) CreateOrganization(org *Organization) error {
-	return s.db.Create(org).Error
-}
-
-// GetOrganizationByID retrieves an organization by its ID.
-func (s *OrganizationService) GetOrganizationByID(id int) (*Organization, error) {
-	org := new(Organization)
-	err := s.db.First(org, id).Error
-	return org, err
-}
-
-// GetOrganizationsByUserID retrieves organizations by user ID.
-func (s *OrganizationService) GetOrganizationsByUserID(userID int) ([]*Organization, error) {
-	var orgs []*Organization
-	err := s.db.Where("user_id = ?", userID).Find(&orgs).Error
+// GetMultipleByUserID retrieves organizations by user ID.
+func (O Organization) GetMultipleByUserID(userID int) ([]Organization, error) {
+	var orgs []Organization
+	err := database.DB.Where("user_id = ?", userID).Find(&orgs).Error
 	return orgs, err
 }
 
-// UpdateOrganization updates an organization.
-func (s *OrganizationService) UpdateOrganization(org *Organization) error {
-	return s.db.Save(org).Error
+// Update updates an organization.
+func (O *Organization) Update() error {
+	return database.DB.Save(O).Error
 }
 
-// DeleteOrganization deletes an organization.
-func (s *OrganizationService) DeleteOrganization(org *Organization) error {
-	return s.db.Delete(org).Error
+// Delete deletes an organization.
+func (O *Organization) Delete() error {
+	return database.DB.Delete(O).Error
 }
