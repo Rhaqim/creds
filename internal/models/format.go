@@ -1,10 +1,10 @@
 package models
 
 // SaveFormat represents the format of the saved data.
-type CredsSaveFormat string
+type CredentialSaveFormat string
 
 const (
-	JSON  CredsSaveFormat = "json"
-	YAML  CredsSaveFormat = "yaml"
-	Plain CredsSaveFormat = "plain"
+	JSON  CredentialSaveFormat = "json"
+	YAML  CredentialSaveFormat = "yaml"
+	Plain CredentialSaveFormat = "plain"
 )
