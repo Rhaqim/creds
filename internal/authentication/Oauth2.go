@@ -157,7 +157,7 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":       "User exists",
+		"message":       "User Logged In Successfully",
 		"access_token":  access,
 		"refresh_token": refresh,
 		"user":          user,
