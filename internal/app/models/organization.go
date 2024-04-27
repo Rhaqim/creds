@@ -14,9 +14,9 @@ const (
 
 type Organization struct {
 	gorm.Model
-	UserID           int                   `json:"user_id" form:"user_id" query:"user_id" gorm:"not null"`
-	OrganizationName string                `json:"organization_name" form:"organization_name" query:"organization_name" gorm:"not null"`
-	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null"`
+	OwnerID          uint                  `json:"owner_id" form:"owner_id" query:"owner_id" gorm:"not null" binding:"required"`
+	OrganizationName string                `json:"organization_name" form:"organization_name" query:"organization_name" gorm:"not null" binding:"required"`
+	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null" binding:"oneof=company personal"`
 }
 
 // Insert creates a new organization.
@@ -29,10 +29,15 @@ func (O *Organization) GetByID(id int) error {
 	return database.DB.Where("id = ?", id).First(O).Error
 }
 
+// GetByOrganizationName retrieves an organization by its name.
+func (O *Organization) GetByOrganizationName(name string) error {
+	return database.DB.Where("organization_name = ?", name).First(O).Error
+}
+
 // GetMultipleByUserID retrieves organizations by user ID.
 func (O Organization) GetMultipleByUserID(userID int) ([]Organization, error) {
 	var orgs []Organization
-	err := database.DB.Where("user_id = ?", userID).Find(&orgs).Error
+	err := database.DB.Where("owner_id = ?", userID).Find(&orgs).Error
 	return orgs, err
 }
 
@@ -44,4 +49,10 @@ func (O *Organization) Update() error {
 // Delete deletes an organization.
 func (O *Organization) Delete() error {
 	return database.DB.Delete(O).Error
+}
+
+func (O *Organization) CreateOrganization(user User) error {
+	O.OwnerID = user.ID
+
+	return O.Insert()
 }

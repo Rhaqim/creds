@@ -13,6 +13,6 @@ const (
 
 type DevelopmentEnvironment struct {
 	gorm.Model
-	OrgnaizationID int              `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null"`
-	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null"`
+	OrgnaizationID uint             `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null"`
+	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null" binding:"oneof=0 1 2 3"`
 }
