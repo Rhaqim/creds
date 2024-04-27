@@ -6,11 +6,11 @@ import (
 	"github.com/Rhaqim/creds/internal/lib"
 )
 
-func TestUserCredentialEncrypt_Decrypt(t *testing.T) {
+func TestEncryptionService_Decrypt(t *testing.T) {
 	key := []byte("0123456789abcdef0123456789abcdef")
 	plaintext := []byte("Hello, World!")
 
-	encrypter := lib.UserCredentialEncrypt{}
+	encrypter := lib.EncryptionService{}
 	ciphertext, err := encrypter.Encrypt(plaintext, key)
 	if err != nil {
 		t.Errorf("encryption error: %v", err)
@@ -26,8 +26,8 @@ func TestUserCredentialEncrypt_Decrypt(t *testing.T) {
 	}
 }
 
-func TestUserCredentialEncrypt_Scramble(t *testing.T) {
-	encrypter := lib.UserCredentialEncrypt{}
+func TestEncryptionService_Scramble(t *testing.T) {
+	encrypter := lib.EncryptionService{}
 
 	sensitiveData := "Hello, World!"
 

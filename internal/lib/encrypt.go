@@ -7,20 +7,16 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-
-	"gorm.io/gorm"
 )
 
 // Simulate user account with encryption key association
-type UserCredentialEncrypt struct {
-	gorm.Model
-	UserID        uint
+type EncryptionService struct {
 	EncryptionKey []byte
 }
 
-func (O *UserCredentialEncrypt) Scramble(sensitiveData string) (string, error) {
+func (O *EncryptionService) Scramble(sensitiveData string) (string, error) {
 
-	O.EncryptionKey = O.generateEncryptionKey()
+	O.EncryptionKey = O.GenerateEncryptionKey()
 
 	// Encrypt data
 	encryptedData, err := O.Encrypt([]byte(sensitiveData), O.EncryptionKey)
@@ -31,13 +27,10 @@ func (O *UserCredentialEncrypt) Scramble(sensitiveData string) (string, error) {
 	// Encode encrypted data to string
 	encodedData := O.EncodeToString(encryptedData)
 
-	// Store encrypted data in a secure location (e.g., database)
-	O.SaveEncodedData(encodedData)
-
 	return encodedData, nil
 }
 
-func (O *UserCredentialEncrypt) Unscramble(encodedData string) (string, error) {
+func (O *EncryptionService) Unscramble(encodedData string) (string, error) {
 	// Retrieve encoded data from secure location
 	decodedData, err := O.DecodeString(encodedData)
 	if err != nil {
@@ -54,7 +47,7 @@ func (O *UserCredentialEncrypt) Unscramble(encodedData string) (string, error) {
 }
 
 // generateEncryptionKey generates a random encryption key
-func (O *UserCredentialEncrypt) generateEncryptionKey() []byte {
+func (O *EncryptionService) GenerateEncryptionKey() []byte {
 	key := make([]byte, 32) // 256-bit key
 	_, err := rand.Read(key)
 	if err != nil {
@@ -64,7 +57,7 @@ func (O *UserCredentialEncrypt) generateEncryptionKey() []byte {
 }
 
 // encrypt encrypts plaintext using the given key
-func (O *UserCredentialEncrypt) Encrypt(plaintext []byte, key []byte) ([]byte, error) {
+func (O *EncryptionService) Encrypt(plaintext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -83,7 +76,7 @@ func (O *UserCredentialEncrypt) Encrypt(plaintext []byte, key []byte) ([]byte, e
 }
 
 // decrypt decrypts ciphertext using the given key
-func (O *UserCredentialEncrypt) Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
+func (O *EncryptionService) Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -101,14 +94,10 @@ func (O *UserCredentialEncrypt) Decrypt(ciphertext []byte, key []byte) ([]byte, 
 	return ciphertext, nil
 }
 
-func (O *UserCredentialEncrypt) EncodeToString(data []byte) string {
+func (O *EncryptionService) EncodeToString(data []byte) string {
 	return hex.EncodeToString(data)
 }
 
-func (O *UserCredentialEncrypt) DecodeString(data string) ([]byte, error) {
+func (O *EncryptionService) DecodeString(data string) ([]byte, error) {
 	return hex.DecodeString(data)
-}
-
-func (O *UserCredentialEncrypt) SaveEncodedData(data string) {
-	// Save encoded data
 }

@@ -55,6 +55,8 @@ func (O *CredentialFile) GetByCredentialIDAndFileName(credentialID int, fileName
 }
 
 func (O *CredentialFile) Save(credID uint) error {
+	var encryptor lib.EncryptionService
+
 	var parser lib.FileParser = lib.FileParser{
 		FileFormat: string(O.FileFormat),
 		FileData:   O.FileData,
@@ -65,10 +67,15 @@ func (O *CredentialFile) Save(credID uint) error {
 
 	// save the key-values
 	for _, kv := range keyValues { // TODO: handle nested key-values, insert many
+		encodedData, err := encryptor.Scramble(kv.Value.(string))
+		if err != nil {
+			return err
+		}
+
 		credField := CredentialField{
 			CredentialID: credID,
 			Key:          kv.Key,
-			Value:        kv.Value.(string),
+			Value:        encodedData,
 		}
 
 		if err := credField.Insert(); err != nil {

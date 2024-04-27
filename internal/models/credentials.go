@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/Rhaqim/creds/internal/database"
+	"github.com/Rhaqim/creds/internal/lib"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,7 @@ const (
 type Credential struct {
 	gorm.Model
 	OrganizationID uint             `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null"`
+	EncryptionKey  []byte           `json:"encryption_key" form:"encryption_key" query:"encryption_key" gorm:"not null"`
 	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null" binding:"oneof=0 1 2 3"`
 	Version        string           `json:"version" form:"version" query:"version" gorm:"not null"`
 }
@@ -87,4 +89,18 @@ func (O *Credential) Update() error {
 // Delete deletes an Credential.
 func (O *Credential) Delete() error {
 	return database.DB.Delete(O).Error
+}
+
+func (O *Credential) Create() error {
+	var encryptor lib.EncryptionService
+
+	// Generate encryption key
+	O.EncryptionKey = encryptor.GenerateEncryptionKey()
+
+	// Insert credential
+	if err := O.Insert(); err != nil {
+		return err
+	}
+
+	return nil
 }
