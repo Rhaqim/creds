@@ -1,17 +1,25 @@
-package app
+package models
 
 import (
 	"github.com/Rhaqim/creds/internal/database"
 	"gorm.io/gorm"
 )
 
+type UserRole string
+
+const (
+	Admin  UserRole = "admin"
+	Member UserRole = "member"
+)
+
 type User struct {
 	gorm.Model
-	DisplayName    string `json:"display_name" binding:"required"`
-	Email          string `json:"email" gorm:"unique" binding:"required"`
-	OAuthID        string `json:"oauth_id" gorm:"unique" binding:"required"`
-	OrganizationID uint   `json:"organization_id,omitempty"`
-	RefreshToken   string `json:"refresh_token,omitempty"`
+	DisplayName    string   `json:"display_name" binding:"required"`
+	Email          string   `json:"email" gorm:"unique" binding:"required"`
+	OAuthID        string   `json:"oauth_id" gorm:"unique" binding:"required"`
+	OrganizationID uint     `json:"organization_id,omitempty"`
+	Role           UserRole `json:"role" binding:"required"`
+	RefreshToken   string   `json:"refresh_token,omitempty"`
 }
 
 // Insert creates a new organization.
@@ -22,6 +30,11 @@ func (O *User) Insert() error {
 // GetnByID retrieves an User by its ID.
 func (O *User) GetByID(id int) error {
 	return database.DB.Where("id = ?", id).First(O).Error
+}
+
+// GetnByEmail retrieves an User by its ID.
+func (O *User) GetByEmail(email string) error {
+	return database.DB.Where("email = ?", email).First(O).Error
 }
 
 // GetByOAuthID retrieves an User by its OAuth ID.
@@ -51,4 +64,9 @@ func (O *User) Update() error {
 // Delete deletes an User.
 func (O *User) Delete() error {
 	return database.DB.Delete(O).Error
+}
+
+// Register creates a new user.
+func (O *User) Register(user User) error {
+	return database.DB.Model(O).Create(O).Error
 }

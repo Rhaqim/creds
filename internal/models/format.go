@@ -1,4 +1,4 @@
-package app
+package models
 
 // SaveFormat represents the format of the saved data.
 type CredsSaveFormat string
