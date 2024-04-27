@@ -65,8 +65,11 @@ func (O *CredentialFile) Save(credID uint) error {
 	// parse the file
 	keyValues := parser.Parse()
 
-	// save the key-values
-	for _, kv := range keyValues { // TODO: handle nested key-values, insert many
+	// Prepare a slice to hold CredentialField objects
+	var credFields []CredentialField
+
+	// Convert key-values to CredentialField objects
+	for _, kv := range keyValues {
 		encodedData, err := encryptor.Scramble(kv.Value.(string))
 		if err != nil {
 			return err
@@ -78,10 +81,8 @@ func (O *CredentialFile) Save(credID uint) error {
 			Value:        encodedData,
 		}
 
-		if err := credField.Insert(); err != nil {
-			return err
-		}
+		credFields = append(credFields, credField)
 	}
 
-	return nil
+	return database.DB.Create(&credFields).Error
 }
