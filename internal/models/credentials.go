@@ -52,19 +52,19 @@ func (O *Credential) Insert() error {
 }
 
 // GetnByID retrieves an Credential by its ID.
-func (O *Credential) GetByID(id int) error {
+func (O *Credential) GetByID(id uint) error {
 	return database.DB.Where("id = ?", id).First(O).Error
 }
 
 // GetMultipleByOrgrID retrieves Credentials by user ID.
-func (O Credential) GetMultipleByOrgID(orgID int) ([]Credential, error) {
+func (O Credential) GetMultipleByOrgID(orgID uint) ([]Credential, error) {
 	var orgs []Credential
 	err := database.DB.Where("organization_id = ?", orgID).Find(&orgs).Error
 	return orgs, err
 }
 
 // GetMultipleByEnvID retrieves Credentials by user ID.
-func (O Credential) GetMultipleByEnvID(envID int) ([]Credential, error) {
+func (O Credential) GetMultipleByEnvID(envID uint) ([]Credential, error) {
 	var orgs []Credential
 	err := database.DB.Where("environment_id = ?", envID).Find(&orgs).Error
 	return orgs, err

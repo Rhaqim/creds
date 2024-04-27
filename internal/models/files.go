@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/Rhaqim/creds/internal/database"
+	"github.com/Rhaqim/creds/internal/lib"
 	"gorm.io/gorm"
 )
 
@@ -42,4 +43,29 @@ func (O *CredentialFile) GetByFileName(fileName string) error {
 
 func (O *CredentialFile) GetByCredentialIDAndFileName(credentialID int, fileName string) error {
 	return database.DB.Where("credential_id = ? AND file_name = ?", credentialID, fileName).First(O).Error
+}
+
+func (O *CredentialFile) Save(credID uint) error {
+	var parser lib.FileParser = lib.FileParser{
+		FileFormat: string(O.FileFormat),
+		FileData:   O.FileData,
+	}
+
+	// parse the file
+	keyValues := parser.Parse()
+
+	// save the key-values
+	for _, kv := range keyValues { // TODO: handle nested key-values, insert many
+		credField := CredentialField{
+			CredentialID: credID,
+			Key:          kv.Key,
+			Value:        kv.Value.(string),
+		}
+
+		if err := credField.Insert(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

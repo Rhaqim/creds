@@ -7,45 +7,49 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+
+	"gorm.io/gorm"
 )
 
 // Simulate user account with encryption key association
-type User struct {
-	ID            int
+type UserCredentialEncrypt struct {
+	gorm.Model
+	UserID        uint
 	EncryptionKey []byte
 }
 
 func Check() {
 	// Simulated user account with encryption key
-	user := User{
-		ID:            123,
-		EncryptionKey: generateEncryptionKey(),
+	user := UserCredentialEncrypt{
+		UserID: 1,
 	}
+
+	user.EncryptionKey = user.generateEncryptionKey()
 
 	// Data to be encrypted
 	sensitiveData := "Sensitive information"
 
 	// Encrypt data
-	encryptedData, err := encrypt([]byte(sensitiveData), user.EncryptionKey)
+	encryptedData, err := user.encrypt([]byte(sensitiveData), user.EncryptionKey)
 	if err != nil {
 		fmt.Println("Encryption error:", err)
 		return
 	}
 
 	// Encode encrypted data to string
-	encodedData := encodeToString(encryptedData)
+	encodedData := user.encodeToString(encryptedData)
 
 	// Store encrypted data in a secure location (e.g., database)
-	saveEncodedData(encodedData)
+	user.saveEncodedData(encodedData)
 
 	// Retrieve encoded data from secure location
-	decodedData, err := decodeString(encodedData)
+	decodedData, err := user.decodeString(encodedData)
 	if err != nil {
 		return
 	}
 
 	// Decrypt data
-	decryptedData, err := decrypt(decodedData, user.EncryptionKey)
+	decryptedData, err := user.decrypt(decodedData, user.EncryptionKey)
 	if err != nil {
 		fmt.Println("Decryption error:", err)
 		return
@@ -55,7 +59,7 @@ func Check() {
 }
 
 // generateEncryptionKey generates a random encryption key
-func generateEncryptionKey() []byte {
+func (O *UserCredentialEncrypt) generateEncryptionKey() []byte {
 	key := make([]byte, 32) // 256-bit key
 	_, err := rand.Read(key)
 	if err != nil {
@@ -65,7 +69,7 @@ func generateEncryptionKey() []byte {
 }
 
 // encrypt encrypts plaintext using the given key
-func encrypt(plaintext []byte, key []byte) ([]byte, error) {
+func (O *UserCredentialEncrypt) encrypt(plaintext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -84,7 +88,7 @@ func encrypt(plaintext []byte, key []byte) ([]byte, error) {
 }
 
 // decrypt decrypts ciphertext using the given key
-func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
+func (O *UserCredentialEncrypt) decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -102,14 +106,14 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func encodeToString(data []byte) string {
+func (O *UserCredentialEncrypt) encodeToString(data []byte) string {
 	return hex.EncodeToString(data)
 }
 
-func decodeString(data string) ([]byte, error) {
+func (O *UserCredentialEncrypt) decodeString(data string) ([]byte, error) {
 	return hex.DecodeString(data)
 }
 
-func saveEncodedData(data string) {
+func (O *UserCredentialEncrypt) saveEncodedData(data string) {
 	// Save encoded data
 }
