@@ -184,3 +184,8 @@ func (OA *OAuth2) getUserInfo(ctx context.Context, token *oauth2.Token) (map[str
 
 	return userInfo, nil
 }
+
+func Logout(c *gin.Context) {
+	c.SetCookie("token", "", -1, "/", config.Domain, true, true)
+	c.SetCookie("refreshToken", "", -1, "/", config.Domain, true, true)
+}

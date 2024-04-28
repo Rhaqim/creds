@@ -45,3 +45,8 @@ func CallbackHandler(c *gin.Context) {
 
 	handler.OAuth2CallbackHandler(c)
 }
+
+func LogoutHandler(c *gin.Context) {
+	authentication.Logout(c)
+	c.JSON(200, gin.H{"message": "Logged out successfully"})
+}
