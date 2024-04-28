@@ -2,7 +2,9 @@ package models
 
 import (
 	"github.com/Rhaqim/creds/internal/database"
+	err "github.com/Rhaqim/creds/internal/errors"
 	"github.com/Rhaqim/creds/internal/lib"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -17,8 +19,9 @@ const (
 
 type Credential struct {
 	gorm.Model
-	OrganizationID uint             `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null"`
-	EncryptionKey  []byte           `json:"encryption_key" form:"encryption_key" query:"encryption_key" gorm:"not null"`
+	Name           string           `json:"name" form:"name" query:"name" gorm:"not null" binding:"required"`
+	OrganizationID uint             `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null" binding:"required"`
+	EncryptionKey  []byte           `json:"encryption_key,omitempty" form:"encryption_key,omitempty" query:"encryption_key" gorm:"not null"`
 	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null" binding:"oneof=0 1 2 3"`
 	Version        string           `json:"version" form:"version" query:"version" gorm:"not null"`
 }
@@ -91,11 +94,23 @@ func (O *Credential) Delete() error {
 	return database.DB.Delete(O).Error
 }
 
-func (O *Credential) Create() error {
+func (O *Credential) CreateCredential(user User) error {
+	var org Organization
 	var encryptor lib.EncryptionService
+
+	// validate organization
+	if err := org.GetByID(O.OrganizationID); err != nil {
+		return err
+	}
+
+	// validate member
+	if !org.IsMember(user.ID) {
+		return err.ErrNotMemberOfOrganization
+	}
 
 	// Generate encryption key
 	O.EncryptionKey = encryptor.GenerateEncryptionKey()
+	O.Version = uuid.New().String()
 
 	// Insert credential
 	if err := O.Insert(); err != nil {

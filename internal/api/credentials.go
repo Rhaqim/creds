@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateOrganization(c *gin.Context) {
-	var req models.Organization
+func CreateCrendentials(c *gin.Context) {
+	var req models.Credential
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
@@ -25,13 +25,11 @@ func CreateOrganization(c *gin.Context) {
 		return
 	}
 
-	if err := req.CreateOrganization(user); err != nil {
+	if err := req.CreateCredential(user); err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
 			"error": err.Error(),
 		})
 
 		return
 	}
-
-	c.JSON(200, req)
 }

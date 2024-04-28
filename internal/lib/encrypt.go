@@ -16,8 +16,6 @@ type EncryptionService struct {
 
 func (O *EncryptionService) Scramble(sensitiveData string) (string, error) {
 
-	O.EncryptionKey = O.GenerateEncryptionKey()
-
 	// Encrypt data
 	encryptedData, err := O.Encrypt([]byte(sensitiveData), O.EncryptionKey)
 	if err != nil {

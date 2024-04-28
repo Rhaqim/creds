@@ -25,20 +25,24 @@ func (O *Organization) Insert() error {
 	return database.DB.Model(O).Create(O).Error
 }
 
+func (O *Organization) GetOrganization(filter string, args ...interface{}) *gorm.DB {
+	return database.DB.Preload("Members").Where(filter, args...)
+}
+
 // GetnByID retrieves an organization by its ID.
-func (O *Organization) GetByID(id int) error {
-	return database.DB.Where("id = ?", id).First(O).Error
+func (O *Organization) GetByID(id uint) error {
+	return O.GetOrganization("id = ?", id).First(O).Error
 }
 
 // GetByOrganizationName retrieves an organization by its name.
 func (O *Organization) GetByOrganizationName(name string) error {
-	return database.DB.Where("organization_name = ?", name).First(O).Error
+	return O.GetOrganization("organization_name = ?", name).First(O).Error
 }
 
 // GetMultipleByUserID retrieves organizations by user ID.
-func (O Organization) GetMultipleByUserID(userID int) ([]Organization, error) {
+func (O Organization) GetMultipleByUserID(userID uint) ([]Organization, error) {
 	var orgs []Organization
-	err := database.DB.Where("creator_id = ?", userID).Find(&orgs).Error
+	err := database.DB.Joins("Members").Where("user_id = ?", userID).Find(&orgs).Error
 	return orgs, err
 }
 
@@ -73,4 +77,14 @@ func (O *Organization) CreateOrganization(user User) error {
 	}
 
 	return err
+}
+
+func (O *Organization) IsMember(userID uint) bool {
+	for _, member := range O.Members {
+		if member.UserID == userID {
+			return true
+		}
+	}
+
+	return false
 }

@@ -1,8 +1,6 @@
 package api
 
 import (
-	"strconv"
-
 	"github.com/Rhaqim/creds/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -16,36 +14,10 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	credID := c.Param("id")
+	credID := c.Param("cred_id")
+	format := c.Query("format")
 
-	filedata := make([]byte, file.Size)
-
-	// Open the file
-	src, err := file.Open()
-	if err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Read the file
-	_, err = src.Read(filedata)
-	if err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	newFile.FileName = file.Filename
-	newFile.FileSize = file.Size
-	newFile.FileFormat = models.JSON
-	newFile.FileData = filedata
-
-	id, err := strconv.ParseUint(credID, 10, 64)
-	if err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": "invalid credential id"})
-		return
-	}
-
-	err = newFile.Save(uint(id))
+	err = newFile.Process(file, credID, format)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return

@@ -1,6 +1,9 @@
 package models
 
 import (
+	"mime/multipart"
+	"strconv"
+
 	"github.com/Rhaqim/creds/internal/database"
 	"github.com/Rhaqim/creds/internal/lib"
 	"gorm.io/gorm"
@@ -54,6 +57,40 @@ func (O *CredentialFile) GetByCredentialIDAndFileName(credentialID int, fileName
 	return database.DB.Where("credential_id = ? AND file_name = ?", credentialID, fileName).First(O).Error
 }
 
+func (O *CredentialFile) AppendDefaults(file *multipart.FileHeader, format string) error {
+	filedata := make([]byte, file.Size)
+
+	// Open the file
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+
+	// Read the file
+	_, err = src.Read(filedata)
+	if err != nil {
+		return err
+	}
+
+	O.FileName = file.Filename
+	O.FileSize = file.Size
+	O.FileData = filedata
+
+	// Set the file format
+	switch format {
+	case "json":
+		O.FileFormat = JSON
+	case "yaml":
+		O.FileFormat = YAML
+	case "plain":
+		O.FileFormat = Plain
+	default:
+		O.FileFormat = Plain
+	}
+
+	return nil
+}
+
 func (O *CredentialFile) Save(credID uint) error {
 	var encryptor lib.EncryptionService
 
@@ -84,5 +121,27 @@ func (O *CredentialFile) Save(credID uint) error {
 		credFields = append(credFields, credField)
 	}
 
+	// Save the credential fields
 	return database.DB.Create(&credFields).Error
+}
+
+func (O *CredentialFile) Process(file *multipart.FileHeader, id string, format string) error {
+
+	var cred Credential
+
+	O.AppendDefaults(file, format)
+
+	// Get the credential ID
+	credID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	// Get the credential
+	if err := cred.GetByID(uint(credID)); err != nil {
+		return err
+	}
+
+	// Save the file
+	return O.Save(cred.ID)
 }
