@@ -144,7 +144,10 @@ func (O *CredentialFile) Process(user User, file *multipart.FileHeader, id strin
 		return err
 	}
 
-	O.AppendDefaults(file, format)
+	err = O.AppendDefaults(file, format)
+	if err != nil {
+		return err
+	}
 
 	// Save the file
 	return O.Save(cred.ID)
