@@ -14,10 +14,19 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
+	user, err := GetUserFromToken(c)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
 	credID := c.Param("cred_id")
 	format := c.Query("format")
 
-	err = newFile.Process(file, credID, format)
+	err = newFile.Process(user, file, credID, format)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return

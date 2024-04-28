@@ -125,11 +125,8 @@ func (O *CredentialFile) Save(credID uint) error {
 	return database.DB.Create(&credFields).Error
 }
 
-func (O *CredentialFile) Process(file *multipart.FileHeader, id string, format string) error {
-
+func (O *CredentialFile) Process(user User, file *multipart.FileHeader, id string, format string) error {
 	var cred Credential
-
-	O.AppendDefaults(file, format)
 
 	// Get the credential ID
 	credID, err := strconv.ParseUint(id, 10, 64)
@@ -141,6 +138,13 @@ func (O *CredentialFile) Process(file *multipart.FileHeader, id string, format s
 	if err := cred.GetByID(uint(credID)); err != nil {
 		return err
 	}
+
+	// Check if the user is a member of the organization
+	if err := cred.IsMember(user); err != nil {
+		return err
+	}
+
+	O.AppendDefaults(file, format)
 
 	// Save the file
 	return O.Save(cred.ID)

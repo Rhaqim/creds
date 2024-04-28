@@ -94,9 +94,8 @@ func (O *Credential) Delete() error {
 	return database.DB.Delete(O).Error
 }
 
-func (O *Credential) CreateCredential(user User) error {
+func (O *Credential) IsMember(user User) error {
 	var org Organization
-	var encryptor lib.EncryptionService
 
 	// validate organization
 	if err := org.GetByID(O.OrganizationID); err != nil {
@@ -106,6 +105,18 @@ func (O *Credential) CreateCredential(user User) error {
 	// validate member
 	if !org.IsMember(user.ID) {
 		return err.ErrNotMemberOfOrganization
+	}
+
+	return nil
+}
+
+func (O *Credential) CreateCredential(user User) error {
+
+	var encryptor lib.EncryptionService
+
+	// is user a member of the organization
+	if err := O.IsMember(user); err != nil {
+		return err
 	}
 
 	// Generate encryption key
