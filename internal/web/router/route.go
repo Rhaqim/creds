@@ -20,11 +20,11 @@ func Init() error {
 	{
 		organizationGroup := apiGroup.Group("/organization")
 		{
-			organizationGroup.POST("/organization", api.CreateOrganization)
+			organizationGroup.POST("/create", api.CreateOrganization)
 
 			credentialGroup := organizationGroup.Group("/credential")
 			{
-				credentialGroup.POST("/credentials", api.CreateCrendentials)
+				credentialGroup.POST("/create", api.CreateCrendentials)
 				credentialGroup.POST("/file/:cred_id", api.UploadFile)
 			}
 		}

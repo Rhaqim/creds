@@ -1,0 +1,30 @@
+name: creds
+
+services:
+  # creds:
+  #   image: creds
+  #   build:
+  #     context: .
+  #     dockerfile: docker/local/Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - PORT=8080
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_USER=postgres
+  #     - DB_PASSWORD=postgres
+  #     - DB_NAME=postgres
+  #   depends_on:
+  #     - postgres
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"

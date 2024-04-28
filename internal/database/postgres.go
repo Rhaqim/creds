@@ -29,6 +29,15 @@ func Init() {
 	}
 }
 
+func Close() {
+	sqlDB, err := DB.DB()
+	if err != nil {
+		logger.Default.Error(context.Background(), "failed to close database")
+		panic("failed to close database")
+	}
+	sqlDB.Close()
+}
+
 func Insert[T any](t *T) error {
 	result := DB.Model(&t).Create(&t)
 	return result.Error
@@ -72,63 +81,45 @@ func Delete[T any](t *T, query interface{}, args ...interface{}) (*gorm.DB, erro
 	return result, result.Error
 }
 
-// implement DutchDatabase interface
-
-type PostgresDatabase struct {
-	db *gorm.DB
+// implement Database interface
+type Database[T any] interface {
+	Insert() error
+	Get(query interface{}, args ...interface{}) error
+	GetAll(query interface{}, args ...interface{}) ([]T, error)
+	Update(query interface{}, args ...interface{}) error
+	Delete(query interface{}, args ...interface{}) error
 }
 
-func NewPostgresDatabase[T any](post_db *gorm.DB, model *T) *PostgresDatabase {
+type PostgresDatabase[T any] struct {
+	db    *gorm.DB
+	model *T
+}
 
-	return &PostgresDatabase{
-		db: post_db.Model(model),
+func NewPostgresDatabase[T any](model *T) Database[T] {
+
+	return &PostgresDatabase[T]{
+		db: DB.Model(model),
 	}
 }
 
-func (db *PostgresDatabase) Insert(data interface{}) (interface{}, error) {
-	result := db.db.Create(&data)
-
-	return data, result.Error
+func (P *PostgresDatabase[T]) Insert() error {
+	return P.db.Create(P.model).Error
 }
 
-func (db *PostgresDatabase) Update(data interface{}, filter interface{}, args ...interface{}) (interface{}, error) {
-	result := db.db.Where(filter, args...).Updates(data)
-
-	return data, result.Error
+func (P *PostgresDatabase[T]) Get(query interface{}, args ...interface{}) error {
+	return P.db.Where(query, args...).First(P.model).Error
 }
 
-func (db *PostgresDatabase) Get(filter interface{}) (interface{}, error) {
-	var result interface{}
-	result_ := db.db.First(&result, filter)
-
-	return result, result_.Error
+func (P *PostgresDatabase[T]) GetAll(query interface{}, args ...interface{}) ([]T, error) {
+	var results []T
+	result := P.db.Where(query, args...).Find(&results)
+	return results, result.Error
 }
 
-func (db *PostgresDatabase) GetAll(filter interface{}) ([]interface{}, error) {
-	var results []interface{}
-	if err := db.db.Find(&results, filter).Error; err != nil {
-		return nil, err
-	}
-	return results, nil
+func (P *PostgresDatabase[T]) Update(query interface{}, args ...interface{}) error {
+	return P.db.Where(query, args...).Updates(P.model).Error
 }
 
-func (db *PostgresDatabase) Delete(filter interface{}) (interface{}, error) {
-	var result interface{}
-	tx := db.db.Begin()
-	if err := tx.First(&result, filter).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	if err := tx.Delete(&result, filter).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	return &result, tx.Commit().Error
-}
-
-func (p *PostgresDatabase) Disconnect() error {
-	// if p.db != nil {
-	// 	return p.db.Close()
-	// }
-	return nil
+func (P *PostgresDatabase[T]) Delete(query interface{}, args ...interface{}) error {
+	return P.db.Where(query, args...).Delete(P.model).Error
 }
