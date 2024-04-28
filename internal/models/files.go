@@ -64,14 +64,14 @@ func (O *CredentialFile) AppendDefaults(file *multipart.FileHeader, format strin
 	// Open the file
 	src, err := file.Open()
 	if err != nil {
-		fmt.Println("Error opening file")
+		fmt.Println("Error opening file") //TODO: Log this
 		return err
 	}
 
 	// Read the file
 	_, err = src.Read(filedata)
 	if err != nil {
-		fmt.Println("Error reading file")
+		fmt.Println("Error reading file") //TODO: Log this
 		return err
 	}
 
@@ -125,7 +125,7 @@ func (O *CredentialFile) Save(credID uint) error {
 	}
 
 	// Save the credential fields
-	return database.DB.Create(&credFields).Error
+	return database.DB.Create(&credFields).Error // FIXME: This should be a transaction
 }
 
 func (O *CredentialFile) Process(user User, file *multipart.FileHeader, id string, format string) error {

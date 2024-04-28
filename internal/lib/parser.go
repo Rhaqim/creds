@@ -60,7 +60,7 @@ func (O *FileParser) ParsePlain() []KeyValue {
 }
 
 // ExtractKeyValuePairs extracts key-value pairs recursively from a YAML map.
-func (O *FileParser) ExtractKeyValuePairs(data map[string]interface{}) []KeyValue {
+func (O *FileParser) ExtractKeyValuePairs(data map[string]interface{}) []KeyValue { //FIXME: This function only works for yaml files
 	var keyValues []KeyValue
 	for key, value := range data {
 		switch v := value.(type) {
