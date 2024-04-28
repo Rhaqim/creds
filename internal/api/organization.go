@@ -8,14 +8,6 @@ import (
 func CreateOrganization(c *gin.Context) {
 	var req models.Organization
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{
-			"error": err.Error(),
-		})
-
-		return
-	}
-
 	user, err := GetUserFromToken(c)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
@@ -25,13 +17,26 @@ func CreateOrganization(c *gin.Context) {
 		return
 	}
 
-	if err := req.CreateOrganization(user); err != nil {
+	if err := c.Bind(&req); err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
-			"error": err.Error(),
+			"error":   err.Error(),
+			"message": "Invalid request body.",
 		})
 
 		return
 	}
 
-	c.JSON(200, req)
+	if err := req.CreateOrganization(user); err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error":   err.Error(),
+			"message": "Error creating organization.",
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Organization created successfully.",
+		"org":     req,
+	})
 }

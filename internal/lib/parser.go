@@ -42,7 +42,7 @@ func (O *FileParser) ParseYAML() []KeyValue {
 	if err := yaml.Unmarshal(O.FileData, &yamlData); err != nil {
 		log.Fatalf("Error unmarshaling YAML: %v", err)
 	}
-	return O.extractKeyValuePairs(yamlData)
+	return O.ExtractKeyValuePairs(yamlData)
 }
 
 func (O *FileParser) ParseJSON() []KeyValue {
@@ -51,16 +51,16 @@ func (O *FileParser) ParseJSON() []KeyValue {
 	if err := json.Unmarshal(O.FileData, &jsonData); err != nil {
 		log.Fatalf("Error unmarshaling JSON: %v", err)
 	}
-	return O.extractKeyValuePairs(jsonData)
+	return O.ExtractKeyValuePairs(jsonData)
 }
 
 func (O *FileParser) ParsePlain() []KeyValue {
 	scanner := bufio.NewScanner(strings.NewReader(string(O.FileData)))
-	return O.extractKeyValuePairsPlain(scanner)
+	return O.ExtractKeyValuePairsPlain(scanner)
 }
 
-// extractKeyValuePairs extracts key-value pairs recursively from a YAML map.
-func (O *FileParser) extractKeyValuePairs(data map[string]interface{}) []KeyValue {
+// ExtractKeyValuePairs extracts key-value pairs recursively from a YAML map.
+func (O *FileParser) ExtractKeyValuePairs(data map[string]interface{}) []KeyValue {
 	var keyValues []KeyValue
 	for key, value := range data {
 		switch v := value.(type) {
@@ -70,13 +70,13 @@ func (O *FileParser) extractKeyValuePairs(data map[string]interface{}) []KeyValu
 			for k, val := range v {
 				nestedData[fmt.Sprintf("%v", k)] = val
 			}
-			nestedKeyValues := O.extractKeyValuePairs(nestedData)
+			nestedKeyValues := O.ExtractKeyValuePairs(nestedData)
 			keyValues = append(keyValues, nestedKeyValues...)
 		case []interface{}:
 			// Handle nested arrays recursively
 			for i, item := range v {
 				nestedData := map[string]interface{}{fmt.Sprintf("%d", i): item}
-				nestedKeyValues := O.extractKeyValuePairs(nestedData)
+				nestedKeyValues := O.ExtractKeyValuePairs(nestedData)
 				keyValues = append(keyValues, nestedKeyValues...)
 			}
 		default:
@@ -87,8 +87,8 @@ func (O *FileParser) extractKeyValuePairs(data map[string]interface{}) []KeyValu
 	return keyValues
 }
 
-// extractKeyValuePairs extracts key-value pairs from a scanner reading a plain file.
-func (O *FileParser) extractKeyValuePairsPlain(scanner *bufio.Scanner) []KeyValue {
+// ExtractKeyValuePairs extracts key-value pairs from a scanner reading a plain file.
+func (O *FileParser) ExtractKeyValuePairsPlain(scanner *bufio.Scanner) []KeyValue {
 	var keyValues []KeyValue
 	for scanner.Scan() {
 		line := scanner.Text()

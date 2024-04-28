@@ -8,14 +8,6 @@ import (
 func CreateCrendentials(c *gin.Context) {
 	var req models.Credential
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{
-			"error": err.Error(),
-		})
-
-		return
-	}
-
 	user, err := GetUserFromToken(c)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
@@ -25,11 +17,26 @@ func CreateCrendentials(c *gin.Context) {
 		return
 	}
 
-	if err := req.CreateCredential(user); err != nil {
+	if err := c.Bind(&req); err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
-			"error": err.Error(),
+			"error":   err.Error(),
+			"message": "Invalid request body.",
 		})
 
 		return
 	}
+
+	if err := req.CreateCredential(user); err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error":   err.Error(),
+			"message": "Error creating credential.",
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message":    "Credential created successfully",
+		"credential": req,
+	})
 }

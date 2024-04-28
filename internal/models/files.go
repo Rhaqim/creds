@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"mime/multipart"
 	"strconv"
 
@@ -63,12 +64,14 @@ func (O *CredentialFile) AppendDefaults(file *multipart.FileHeader, format strin
 	// Open the file
 	src, err := file.Open()
 	if err != nil {
+		fmt.Println("Error opening file")
 		return err
 	}
 
 	// Read the file
 	_, err = src.Read(filedata)
 	if err != nil {
+		fmt.Println("Error reading file")
 		return err
 	}
 

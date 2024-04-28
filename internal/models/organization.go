@@ -14,9 +14,9 @@ const (
 
 type Organization struct {
 	gorm.Model
-	CreatorID        uint                  `json:"creator_id" form:"creator_id" query:"creator_id" gorm:"not null" binding:"required"`
+	CreatorID        uint                  `json:"creator_id,omitempty" form:"creator_id,omitempty" query:"creator_id" gorm:"not null"`
 	OrganizationName string                `json:"organization_name" form:"organization_name" query:"organization_name" gorm:"not null" binding:"required"`
-	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null" binding:"oneof=company personal"`
+	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null" oneof:"company personal" binding:"required"`
 	Members          []OrganizationMember  `json:"members" form:"members" query:"members" gorm:"foreignKey:OrganizationID"`
 }
 
@@ -56,6 +56,16 @@ func (O *Organization) Delete() error {
 	return database.DB.Delete(O).Error
 }
 
+func (O *Organization) IsMember(userID uint) bool {
+	for _, member := range O.Members {
+		if member.UserID == userID {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (O *Organization) CreateOrganization(user User) error {
 	var err error
 	var member OrganizationMember
@@ -77,14 +87,4 @@ func (O *Organization) CreateOrganization(user User) error {
 	}
 
 	return err
-}
-
-func (O *Organization) IsMember(userID uint) bool {
-	for _, member := range O.Members {
-		if member.UserID == userID {
-			return true
-		}
-	}
-
-	return false
 }
