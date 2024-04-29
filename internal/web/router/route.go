@@ -13,7 +13,7 @@ func Init() error {
 
 	//Enable CORS
 	CorsConfig := cors.DefaultConfig()
-	CorsConfig.AllowAllOrigins = true
+	CorsConfig.AllowOrigins = []string{"http://localhost:3000"}
 
 	r.Use(cors.New(CorsConfig))
 
