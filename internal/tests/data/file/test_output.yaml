@@ -1,0 +1,13 @@
+apikey: "1234567890"
+database:
+  host: localhost
+  password: password
+  port: "5432"
+  user: user
+domains:
+  "0": example.com
+  "1": example.org
+  "2": example.net
+server:
+  host: localhost
+  port: "8080"

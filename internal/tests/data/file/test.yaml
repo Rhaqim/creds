@@ -7,3 +7,10 @@ database:
 server:
   host: localhost
   port: 8080
+
+apikey: 1234567890
+
+domains:
+  - example.com
+  - example.org
+  - example.net
