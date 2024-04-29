@@ -20,12 +20,12 @@ func TestFileParser_extractKeyValuePairs(t *testing.T) {
 			"nestedKey2": "nestedValue2",
 		},
 	}
-	expected1 := []lib.KeyValue{
+	expected1 := []lib.KeyValueStr{
 		{Key: "key1", Value: "value1"},
 		{Key: "nestedKey1", Value: "nestedValue1"},
 		{Key: "nestedKey2", Value: "nestedValue2"},
 	}
-	result1 := parser.ExtractKeyValuePairs(data1)
+	result1 := parser.ExtractKeyValuePairs("", data1)
 	if !reflect.DeepEqual(result1, expected1) {
 		t.Errorf("Test case 1 failed. Expected: %v, got: %v", expected1, result1)
 	}
@@ -38,12 +38,12 @@ func TestFileParser_extractKeyValuePairs(t *testing.T) {
 			"item2",
 		},
 	}
-	expected2 := []lib.KeyValue{
+	expected2 := []lib.KeyValueStr{
 		{Key: "key1", Value: "value1"},
 		{Key: "0", Value: "item1"},
 		{Key: "1", Value: "item2"},
 	}
-	result2 := parser.ExtractKeyValuePairs(data2)
+	result2 := parser.ExtractKeyValuePairs("", data2)
 	if !reflect.DeepEqual(result2, expected2) {
 		t.Errorf("Test case 2 failed. Expected: %v, got: %v", expected2, result2)
 	}
@@ -53,11 +53,11 @@ func TestFileParser_extractKeyValuePairs(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	expected3 := []lib.KeyValue{
+	expected3 := []lib.KeyValueStr{
 		{Key: "key1", Value: "value1"},
 		{Key: "key2", Value: "value2"},
 	}
-	result3 := parser.ExtractKeyValuePairs(data3)
+	result3 := parser.ExtractKeyValuePairs("", data3)
 	if !reflect.DeepEqual(result3, expected3) {
 		t.Errorf("Test case 3 failed. Expected: %v, got: %v", expected3, result3)
 	}
@@ -85,7 +85,7 @@ func TestFileParser_Parse(t *testing.T) {
 	}
 
 	// Test case 1: YAML file format
-	expected1 := []lib.KeyValue{
+	expected1 := []lib.KeyValueStr{
 		{Key: "key1", Value: "value1"},
 		{Key: "key2", Value: "value2"},
 	}
@@ -103,7 +103,7 @@ func TestFileParser_Parse(t *testing.T) {
 	parser.FileData = data
 
 	// Test case 2: JSON file format
-	expected2 := []lib.KeyValue{
+	expected2 := []lib.KeyValueStr{
 		{Key: "key1", Value: "value1"},
 		{Key: "key2", Value: "value2"},
 	}
@@ -121,7 +121,7 @@ func TestFileParser_Parse(t *testing.T) {
 	parser.FileData = data
 
 	// Test case 3: Plain file format
-	expected3 := []lib.KeyValue{
+	expected3 := []lib.KeyValueStr{
 		{Key: "key1", Value: "value1"},
 		{Key: "key2", Value: "value2"},
 	}

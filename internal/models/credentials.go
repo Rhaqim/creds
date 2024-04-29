@@ -28,9 +28,10 @@ type Credential struct {
 
 type CredentialField struct {
 	gorm.Model
-	CredentialID uint   `json:"creds_id" form:"creds_id" query:"creds_id" gorm:"not null"`
-	Key          string `json:"key" form:"key" query:"key" gorm:"not null"`
-	Value        string `json:"value" form:"value" query:"value" gorm:"not null"`
+	CredentialID     uint   `json:"creds_id" form:"creds_id" query:"creds_id" gorm:"not null"`
+	CredentialFileID uint   `json:"file_id" form:"file_id" query:"file_id"`
+	Key              string `json:"key" form:"key" query:"key" gorm:"not null"`
+	Value            string `json:"value" form:"value" query:"value" gorm:"not null"`
 }
 
 // Insert creates a new CredentialField.

@@ -12,10 +12,9 @@ func AuthGuard() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
 		var token string
+		var user models.User
 
 		var jwt *authentication.JWT = authentication.NewJWT()
-
-		var user models.User
 
 		// get token from cookie
 		token, err = c.Cookie("token")

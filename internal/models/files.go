@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/Rhaqim/creds/internal/database"
+	errs "github.com/Rhaqim/creds/internal/errors"
 	"github.com/Rhaqim/creds/internal/lib"
 	"gorm.io/gorm"
 )
@@ -105,27 +106,38 @@ func (O *CredentialFile) Save(credID uint) error {
 	// parse the file
 	keyValues := parser.Parse()
 
+	// save the file
+	err := O.Insert()
+	if err != nil {
+		return err
+	}
+
+	if len(keyValues) == 0 {
+		return errs.ErrEmptyFile
+	}
+
 	// Prepare a slice to hold CredentialField objects
 	var credFields []CredentialField
 
 	// Convert key-values to CredentialField objects
 	for _, kv := range keyValues {
-		encodedData, err := encryptor.Scramble(kv.Value.(string))
+		encodedData, err := encryptor.Scramble(kv.Value)
 		if err != nil {
 			return err
 		}
 
 		credField := CredentialField{
-			CredentialID: credID,
-			Key:          kv.Key,
-			Value:        encodedData,
+			CredentialID:     credID,
+			CredentialFileID: O.ID,
+			Key:              kv.Key,
+			Value:            encodedData,
 		}
 
 		credFields = append(credFields, credField)
 	}
 
 	// Save the credential fields
-	return database.DB.Create(&credFields).Error // FIXME: This should be a transaction
+	return database.DB.Create(&credFields).Error
 }
 
 func (O *CredentialFile) Process(user User, file *multipart.FileHeader, id string, format string) error {

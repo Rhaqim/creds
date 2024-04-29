@@ -11,11 +11,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type KeyValueStr struct {
-	Key   string `json:"key" yaml:"key"`
-	Value string `json:"value" yaml:"value"`
-}
-
 // ConvertJSONToKeyValueStr converts JSON data to a slice of KeyValueStr structs.
 func ConvertJSONToKeyValueStr(data []byte) ([]KeyValueStr, error) {
 	var result []KeyValueStr
@@ -76,7 +71,7 @@ func extractKeyValuePairs(prefix string, data interface{}) []KeyValueStr {
 }
 
 // ConvertKeyValueStrToOriginal converts a slice of KeyValueStr structs back to the original data structure.
-func ConvertKeyValueStrToOriginal2(keyValues []KeyValueStr) (interface{}, error) {
+func ConvertKeyValueStrToOriginal(keyValues []KeyValueStr) (interface{}, error) {
 	dataMap := make(map[string]interface{})
 	for _, kv := range keyValues {
 		keys := strings.Split(kv.Key, "->")
@@ -97,12 +92,12 @@ func ConvertKeyValueStrToOriginal2(keyValues []KeyValueStr) (interface{}, error)
 		}
 	}
 	// Convert map to appropriate type (map, slice, etc.)
-	data := convertMapToType2(dataMap)
+	data := convertMapToType(dataMap)
 	return data, nil
 }
 
 // convertMapToType converts a map[string]interface{} to the appropriate data structure.
-func convertMapToType2(dataMap map[string]interface{}) interface{} {
+func convertMapToType(dataMap map[string]interface{}) interface{} {
 	result := make(map[string]interface{})
 	for key, value := range dataMap {
 		if strings.Contains(key, "->") {
@@ -176,7 +171,7 @@ func Check2() {
 	}
 
 	// Convert KeyValueStr to original data structure
-	originalDataJSON, err := ConvertKeyValueStrToOriginal2(keyValuesJSON)
+	originalDataJSON, err := ConvertKeyValueStrToOriginal(keyValuesJSON)
 	if err != nil {
 		log.Fatalf("Error converting KeyValueStr to original data structure: %v", err)
 	}
@@ -184,7 +179,7 @@ func Check2() {
 	fmt.Println("\nKeyValueStr to JSON:")
 	fmt.Println(originalDataJSON)
 
-	originalDataYAML, err := ConvertKeyValueStrToOriginal2(keyValuesYAML)
+	originalDataYAML, err := ConvertKeyValueStrToOriginal(keyValuesYAML)
 	if err != nil {
 		log.Fatalf("Error converting KeyValueStr to original data structure: %v", err)
 	}
