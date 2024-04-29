@@ -38,7 +38,7 @@ var (
 var (
 	GoogleOAuth2ClientID         = ut.Env("GOOGLE_OAUTH2_CLIENT_ID", "")
 	GoogleOAuth2ClientSecret     = ut.Env("GOOGLE_OAUTH2_CLIENT_SECRET", "")
-	GoogleOAuth2RedirectURL      = ut.Env("GOOGLE_OAUTH2_REDIRECT_URL", "http://localhost:8080/api/v2/auth/google/callback")
+	GoogleOAuth2RedirectURL      = ut.Env("GOOGLE_OAUTH2_REDIRECT_URL", "http://localhost:8080/auth/google/callback")
 	GoogleOAuth2AuthURL          = ut.Env("GOOGLE_OAUTH2_AUTH_URL", "https://accounts.google.com/o/oauth2/auth")
 	GoogleOAuth2TokenURL         = ut.Env("GOOGLE_OAUTH2_TOKEN_URL", "https://accounts.google.com/o/oauth2/token")
 	GoogleOAuth2Scope            = ut.Env("GOOGLE_OAUTH2_SCOPE", "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile, openid")
@@ -51,7 +51,7 @@ var (
 var (
 	GithubOAuth2ClientID     = ut.Env("GITHUB_OAUTH2_CLIENT_ID", "")
 	GithubOAuth2ClientSecret = ut.Env("GITHUB_OAUTH2_CLIENT_SECRET", "")
-	GithubOAuth2RedirectURL  = ut.Env("GITHUB_OAUTH2_REDIRECT_URL", "https://localhost:8080/api/v2/auth/github/callback")
+	GithubOAuth2RedirectURL  = ut.Env("GITHUB_OAUTH2_REDIRECT_URL", "https://localhost:8080/auth/github/callback")
 	GithubOAuth2AuthURL      = ut.Env("GITHUB_OAUTH2_AUTH_URL", "https://www.github.com/auth/authorize")
 	GithubOAuth2TokenURL     = ut.Env("GITHUB_OAUTH2_TOKEN_URL", "https://www.github.com/auth/token")
 	GithubOAuth2Scope        = ut.Env("GITHUB_OAUTH2_SCOPE", "email name")

@@ -60,13 +60,14 @@ func NewOAuth2Adapter(provider string) *OAuth2 {
 func (OA *OAuth2) OAuth2LoginHandler(c *gin.Context) {
 
 	// Generate the OAuth2 URL
-	url := OA.oauthConf.AuthCodeURL(config.GoogleOAuth2OauthStateString, oauth2.AccessTypeOffline)
+	url := OA.oauthConf.AuthCodeURL(config.GoogleOAuth2OauthStateString)
 
 	// Redirect the user to the OAuth2 provider for authentication
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (OA *OAuth2) OAuth2CallbackHandler(c *gin.Context) {
+
 	state := c.Query("state")
 	if state != config.GoogleOAuth2OauthStateString {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -96,24 +97,6 @@ func (OA *OAuth2) OAuth2CallbackHandler(c *gin.Context) {
 		return
 	}
 
-	access, refresh, err := NewJWT().GenerateToken(userInfo["email"].(string), userInfo["first_name"].(string), userInfo["openid"].(string))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to generate token",
-		})
-		return
-	}
-
-	c.SetSameSite(http.SameSiteStrictMode)
-	c.SetCookie("token", access, config.CookieTokenExpireTime, "/", config.Domain, true, true)
-	c.SetCookie("refreshToken", refresh, config.CookieRefreshTokenExpireTime, "/", config.Domain, true, true)
-
-	c.JSON(http.StatusOK, gin.H{
-		"access_token":  access,
-		"refresh_token": refresh,
-		"user":          userInfo,
-	})
-
 	OA.UserExistsHandler(c, userInfo)
 
 }
@@ -122,14 +105,8 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 	var user models.User
 
 	var email string = userInfo["email"].(string)
-
-	access, refresh, err := NewJWT().GenerateToken(email, userInfo["first_name"].(string), userInfo["openid"].(string))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to generate token",
-		})
-		return
-	}
+	var name string = userInfo["name"].(string)
+	var oauthID string = userInfo["sub"].(string)
 
 	// Get User
 	err = user.GetByEmail(email)
@@ -137,8 +114,8 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 		if err.Error() == "record not found" {
 			// Create new user
 			user.Email = email
-			user.DisplayName = userInfo["first_name"].(string)
-			user.OAuthID = userInfo["openid"].(string)
+			user.DisplayName = name
+			user.OAuthID = oauthID
 
 			err := user.Register(user)
 			if err != nil {
@@ -155,6 +132,18 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 		}
 
 	}
+
+	access, refresh, err := NewJWT().GenerateToken(email, name, oauthID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to generate token",
+		})
+		return
+	}
+
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("token", access, config.CookieTokenExpireTime, "/", config.Domain, true, true)
+	c.SetCookie("refreshToken", refresh, config.CookieRefreshTokenExpireTime, "/", config.Domain, true, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":       "User Logged In Successfully",
