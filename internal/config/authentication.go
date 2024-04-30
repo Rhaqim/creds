@@ -7,8 +7,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var Domain = "localhost"
-
 // Authentication
 var (
 	AccessSecret  = ut.Env("ACCESS_SECRET", "")

@@ -11,8 +11,14 @@ import (
 func Init() error {
 	r := gin.Default()
 
+	// Set proxies
+	r.SetTrustedProxies([]string{
+		"http://localhost:3000",
+	})
+
 	//Enable CORS
 	CorsConfig := cors.DefaultConfig()
+	CorsConfig.AllowCredentials = true
 	CorsConfig.AllowOrigins = []string{"http://localhost:3000"}
 
 	r.Use(cors.New(CorsConfig))

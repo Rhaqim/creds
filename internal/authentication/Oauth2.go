@@ -145,12 +145,7 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 	c.SetCookie("token", access, config.CookieTokenExpireTime, "/", config.Domain, true, true)
 	c.SetCookie("refreshToken", refresh, config.CookieRefreshTokenExpireTime, "/", config.Domain, true, true)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":       "User Logged In Successfully",
-		"access_token":  access,
-		"refresh_token": refresh,
-		"user":          user,
-	})
+	c.Redirect(http.StatusFound, config.FrontendURL)
 }
 
 func (OA *OAuth2) getUserInfo(ctx context.Context, token *oauth2.Token) (map[string]interface{}, error) {
