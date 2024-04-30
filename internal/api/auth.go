@@ -50,3 +50,15 @@ func LogoutHandler(c *gin.Context) {
 	authentication.Logout(c)
 	c.JSON(200, gin.H{"message": "Logged out successfully"})
 }
+
+func AuthMeHandler(c *gin.Context) {
+	user, err := GetUserFromToken(c)
+	if err != nil {
+		c.AbortWithStatusJSON(401, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, user)
+}

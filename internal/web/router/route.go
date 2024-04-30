@@ -30,6 +30,7 @@ func Init() error {
 
 		authenticationGroup.Use(middleware.AuthGuard())
 		{
+			authenticationGroup.GET("/me", api.AuthMeHandler)
 			authenticationGroup.GET("/logout", api.LogoutHandler)
 		}
 	}
