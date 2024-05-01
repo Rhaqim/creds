@@ -25,13 +25,13 @@ func (O *OrganizationMember) Insert() error {
 }
 
 // GetnByID retrieves an organization by its ID.
-func (O *OrganizationMember) GetByID(id int) error {
+func (O *OrganizationMember) GetByID(id uint) error {
 	return database.DB.Where("id = ?", id).First(O).Error
 }
 
 // GetMultipleByUserID retrieves organizations by user ID.
-func (O Organization) GetMultipleByOrgrID(orgID int) ([]Organization, error) {
-	var orgs []Organization
+func (O OrganizationMember) GetMultipleByOrgID(orgID uint) ([]OrganizationMember, error) {
+	var orgs []OrganizationMember
 	err := database.DB.Where("organization_id = ?", orgID).Find(&orgs).Error
 	return orgs, err
 }

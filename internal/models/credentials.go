@@ -78,6 +78,12 @@ func (O Credential) GetMultipleByOrgID(orgID uint) ([]Credential, error) {
 	return orgs, err
 }
 
+func (O Credential) GetMultipleByOrgIDWithoutEncK(orgID uint) ([]Credential, error) {
+	var orgs []Credential
+	err := database.DB.Select("id, name, organization_id, environment, version").Where("organization_id = ?", orgID).Find(&orgs).Error
+	return orgs, err
+}
+
 // GetMultipleByEnvID retrieves Credentials by user ID.
 func (O Credential) GetMultipleByEnvID(envID uint) ([]Credential, error) {
 	var orgs []Credential

@@ -40,8 +40,8 @@ func Init() error {
 	{
 		organizationGroup := apiGroup.Group("/organization")
 		{
-			organizationGroup.GET("", api.CreateOrganization)
-			organizationGroup.GET("/:orgId", api.CreateOrganization)
+			organizationGroup.GET("", api.GetOrganizations)
+			organizationGroup.GET("/:orgId", api.GetOrganization)
 			organizationGroup.POST("/create", api.CreateOrganization)
 
 			credentialGroup := organizationGroup.Group("/credentials")

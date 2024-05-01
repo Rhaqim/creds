@@ -11,8 +11,8 @@ import (
 func AuthGuard() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
-		var token string
 		var user models.User
+		var token string
 
 		var jwt *authentication.JWT = authentication.NewJWT()
 
