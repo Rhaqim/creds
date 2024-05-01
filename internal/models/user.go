@@ -47,6 +47,13 @@ func (O User) GetAll() ([]string, error) {
 	return dis, err
 }
 
+// GetMemberUsers retrieves users for the user IDs
+func (O User) GetMemberUsers(userIDs []uint) ([]User, error) {
+	var orgs []User
+	err := database.DB.Select("id, display_name").Where("id IN ?", userIDs).Find(&orgs).Error
+	return orgs, err
+}
+
 // Update updates an User.
 func (O *User) Update() error {
 	return database.DB.Save(O).Error

@@ -26,9 +26,10 @@ type Organization struct {
 
 type OrganizationReturn struct {
 	Organization
-	MembersCount     int `json:"members_count"`
-	Credentials      []Credential
-	CredentialsCount int `json:"credentials_count"`
+	MembersUser      []User       `json:"members_user"`
+	MembersCount     int          `json:"members_count"`
+	Credentials      []Credential `json:"credentials"`
+	CredentialsCount int          `json:"credentials_count"`
 }
 
 // Insert creates a new organization.
@@ -53,7 +54,7 @@ func (O *Organization) GetByOrganizationName(name string) error {
 // GetMultipleByUserID retrieves organizations by user ID.
 func (O Organization) GetMultipleByUserID(userID uint) ([]Organization, error) {
 	var orgs []Organization
-	err := database.DB.Preload("Members").Where("creator_id = ?", userID).Find(&orgs).Error
+	err := O.GetOrganization("creator_id = ?", userID).Find(&orgs).Error
 	return orgs, err
 }
 
@@ -134,12 +135,19 @@ func (O *Organization) FetchOrganizations(user User) ([]OrganizationReturn, erro
 	return resp, err
 }
 
-func (O *Organization) FetchMembers() ([]OrganizationMember, error) {
+func (O *Organization) FetchMembers() ([]User, error) {
 	var err error
-	var member OrganizationMember
+	var user User
+	var members []User
+
+	var user_ids []uint
+
+	for _, member := range O.Members {
+		user_ids = append(user_ids, member.UserID)
+	}
 
 	// Fetch members
-	members, err := member.GetMultipleByOrgID(O.ID)
+	members, err = user.GetMemberUsers(user_ids)
 	if err != nil {
 		return members, err
 	}
@@ -169,6 +177,12 @@ func (O *Organization) FetchOrganization(user User, id string) (OrganizationRetu
 		return resp, errs.ErrNotMemberOfOrganization
 	}
 
+	// Fetch members
+	membersUser, err := O.FetchMembers()
+	if err != nil {
+		return resp, err
+	}
+
 	// Fetch credentials
 	creds, err = cred.GetMultipleByOrgIDWithoutEncK(O.ID)
 	if err != nil {
@@ -179,6 +193,7 @@ func (O *Organization) FetchOrganization(user User, id string) (OrganizationRetu
 	resp = OrganizationReturn{
 		Organization:     *O,
 		MembersCount:     len(O.Members),
+		MembersUser:      membersUser,
 		Credentials:      creds,
 		CredentialsCount: len(creds),
 	}
