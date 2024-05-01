@@ -40,12 +40,23 @@ func Init() error {
 	{
 		organizationGroup := apiGroup.Group("/organization")
 		{
+			organizationGroup.GET("", api.CreateOrganization)
+			organizationGroup.GET("/:orgId", api.CreateOrganization)
 			organizationGroup.POST("/create", api.CreateOrganization)
 
-			credentialGroup := organizationGroup.Group("/credential")
+			credentialGroup := organizationGroup.Group("/credentials")
 			{
+				credentialGroup.GET("", api.CreateCrendentials)
+				credentialGroup.GET("/:credId", api.CreateCrendentials)
+				credentialGroup.POST("/:cred_id/upload", api.UploadFile)
 				credentialGroup.POST("/create", api.CreateCrendentials)
-				credentialGroup.POST("/file/:cred_id", api.UploadFile)
+			}
+
+			teamGroup := organizationGroup.Group("/team")
+			{
+				teamGroup.GET("", api.GetMembers)
+				teamGroup.GET("/:memId", api.GetMember)
+				teamGroup.POST("/add", api.CreateCrendentials)
 			}
 		}
 	}

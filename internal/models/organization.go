@@ -16,6 +16,7 @@ type Organization struct {
 	gorm.Model
 	CreatorID        uint                  `json:"creator_id,omitempty" form:"creator_id,omitempty" query:"creator_id" gorm:"not null"`
 	OrganizationName string                `json:"organization_name" form:"organization_name" query:"organization_name" gorm:"not null" binding:"required"`
+	Description      string                `json:"description" form:"description" query:"description" gorm:"not null" binding:"required"`
 	OrganizationType CredsOrganizationType `json:"organization_type" form:"organization_type" query:"organization_type" gorm:"not null" oneof:"company personal" binding:"required"`
 	Members          []OrganizationMember  `json:"members" form:"members" query:"members" gorm:"foreignKey:OrganizationID"`
 }
