@@ -11,7 +11,7 @@ import (
 type CredsEnvironment int
 
 const (
-	Development CredsEnvironment = iota
+	Development CredsEnvironment = iota + 1
 	Staging
 	Preproduction
 	Production
@@ -22,7 +22,7 @@ type Credential struct {
 	Name           string           `json:"name" form:"name" query:"name" gorm:"not null" binding:"required"`
 	OrganizationID uint             `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null" binding:"required"`
 	EncryptionKey  []byte           `json:"encryption_key,omitempty" form:"encryption_key,omitempty" query:"encryption_key" gorm:"not null"`
-	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null" oneof:"0 1 2 3" binding:"required"`
+	Environment    CredsEnvironment `json:"environment" form:"environment" query:"environment" gorm:"not null" oneof:"1 2 3 4" binding:"required"`
 	Version        string           `json:"version" form:"version" query:"version" gorm:"not null"`
 }
 

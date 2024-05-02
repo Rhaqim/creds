@@ -35,6 +35,8 @@ func CreateCrendentials(c *gin.Context) {
 		return
 	}
 
+	req.EncryptionKey = nil
+
 	c.JSON(200, gin.H{
 		"message":    "Credential created successfully",
 		"credential": req,
