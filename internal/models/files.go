@@ -55,8 +55,12 @@ func (O *CredentialFile) GetByFileName(fileName string) error {
 	return database.DB.Where("file_name = ?", fileName).First(O).Error
 }
 
-func (O *CredentialFile) GetByCredentialIDAndFileName(credentialID int, fileName string) error {
+func (O *CredentialFile) GetByCredentialIDAndFileName(credentialID uint, fileName string) error {
 	return database.DB.Where("credential_id = ? AND file_name = ?", credentialID, fileName).First(O).Error
+}
+
+func (O *CredentialFile) GetByCredentialID(credentialID uint) error {
+	return database.DB.Where("credential_id = ?", credentialID).First(O).Error
 }
 
 func (O *CredentialFile) AppendDefaults(file *multipart.FileHeader, format string) error {

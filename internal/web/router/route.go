@@ -46,8 +46,8 @@ func Init() error {
 
 			credentialGroup := organizationGroup.Group("/credentials")
 			{
-				credentialGroup.GET("", api.CreateCrendentials)
-				credentialGroup.GET("/:credId", api.CreateCrendentials)
+				// credentialGroup.GET("", api.CreateCrendentials)
+				credentialGroup.GET("/:credId", api.GetCredential)
 				credentialGroup.POST("/:cred_id/upload", api.UploadFile)
 				credentialGroup.POST("/create", api.CreateCrendentials)
 			}

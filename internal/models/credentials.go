@@ -1,6 +1,8 @@
 package models
 
 import (
+	"strconv"
+
 	"github.com/Rhaqim/creds/internal/database"
 	err "github.com/Rhaqim/creds/internal/errors"
 	"github.com/Rhaqim/creds/internal/lib"
@@ -34,6 +36,15 @@ type CredentialField struct {
 	Value            string `json:"value" form:"value" query:"value" gorm:"not null"`
 }
 
+type CredentialReturn struct {
+	Credential Credential `json:"credential"`
+	Fields     []struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	}
+	File CredentialFile `json:"file,omitempty"`
+}
+
 // Insert creates a new CredentialField.
 func (O *CredentialField) Insert() error {
 	return database.DB.Model(O).Create(O).Error
@@ -45,7 +56,7 @@ func (O *CredentialField) GetByID(id int) error {
 }
 
 // GetMultipleByUserID retrieves CredentialFields by user ID.
-func (O CredentialField) GetMultipleByCredentialID(credsID int) ([]CredentialField, error) {
+func (O CredentialField) GetMultipleByCredentialID(credsID uint) ([]CredentialField, error) {
 	var orgs []CredentialField
 	err := database.DB.Where("creds_id = ?", credsID).Find(&orgs).Error
 	return orgs, err
@@ -136,4 +147,82 @@ func (O *Credential) CreateCredential(user User) error {
 	}
 
 	return nil
+}
+
+func (O *Credential) FetchFile(user User) CredentialFile {
+
+	var file CredentialFile
+
+	// Get file
+	_ = file.GetByCredentialID(O.ID)
+
+	return file
+}
+
+func (O *Credential) FetchFields() []CredentialField {
+	var fields []CredentialField
+	var field CredentialField
+
+	// Get fields
+	fields, _ = field.GetMultipleByCredentialID(O.ID)
+
+	return fields
+}
+
+func (O *Credential) FetchCredential(user User, id string) (CredentialReturn, error) {
+	var err error
+	var resp CredentialReturn
+
+	// convert id to uint
+	credId, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return resp, err
+	}
+
+	// Get credential
+	if err = O.GetByID(uint(credId)); err != nil {
+		return resp, err
+	}
+
+	// is user a member of the organization
+	if err = O.IsMember(user); err != nil {
+		return resp, err
+	}
+
+	// Get file
+	file := O.FetchFile(user)
+
+	// Get fields
+	fields := O.FetchFields()
+
+	// append fields to response
+	if len(fields) == 0 {
+		resp.Fields = make([]struct {
+			Key   string `json:"key"`
+			Value string `json:"value"`
+		}, 0)
+	} else {
+
+		for _, f := range fields {
+			resp.Fields = append(resp.Fields, struct {
+				Key   string `json:"key"`
+				Value string `json:"value"`
+			}{
+				Key:   f.Key,
+				Value: f.Value,
+			})
+		}
+	}
+
+	O.EncryptionKey = nil
+
+	resp.Credential = *O
+
+	if file.ID != 0 {
+		resp.File = file
+	} else {
+		resp.File = CredentialFile{}
+	}
+
+	return resp, err
 }

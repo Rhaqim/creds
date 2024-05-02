@@ -42,3 +42,34 @@ func CreateCrendentials(c *gin.Context) {
 		"credential": req,
 	})
 }
+
+func GetCredential(c *gin.Context) {
+	var cred models.Credential
+
+	user, err := GetUserFromToken(c)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	id := c.Param("credId")
+
+	resp, err := cred.FetchCredential(user, id)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error":   err.Error(),
+			"message": "Error fetching credential.",
+		})
+
+		return
+	}
+
+	cred.EncryptionKey = nil
+
+	c.JSON(200, gin.H{
+		"credential": resp,
+	})
+}

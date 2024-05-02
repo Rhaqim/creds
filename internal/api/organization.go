@@ -84,6 +84,7 @@ func GetOrganization(c *gin.Context) {
 	}
 
 	id := c.Param("orgId")
+
 	resp, err = org.FetchOrganization(user, id)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{
