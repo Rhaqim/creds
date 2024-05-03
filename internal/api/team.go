@@ -112,3 +112,32 @@ func GetMember(c *gin.Context) {
 		"org":     req,
 	})
 }
+
+func InviteMember(c *gin.Context) {
+	var mem models.OrganizationMember
+
+	user, err := GetUserFromToken(c)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	email := c.PostForm("email")
+	orgID := c.PostForm("org_id")
+
+	if err := mem.InviteMember(user, email, orgID); err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error":   err.Error(),
+			"message": "Error inviting member.",
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Invitation sent successfully.",
+	})
+}

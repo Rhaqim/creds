@@ -226,3 +226,35 @@ func (O *Credential) FetchCredential(user User, id string) (CredentialReturn, er
 
 	return resp, err
 }
+
+func (O *Credential) AddFields(user User, fields []CredentialField, id string) error {
+	var err error
+
+	// convert id to uint
+	credId, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	// Get credential
+	if err = O.GetByID(uint(credId)); err != nil {
+		return err
+	}
+
+	// is user a member of the organization
+	if err = O.IsMember(user); err != nil {
+		return err
+	}
+
+	for i := range fields {
+		fields[i].CredentialID = O.ID
+	}
+
+	// Insert fields
+	err = database.DB.Create(&fields).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -50,6 +50,7 @@ func Init() error {
 				credentialGroup.GET("/:credId", api.GetCredential)
 				credentialGroup.POST("/:cred_id/upload", api.UploadFile)
 				credentialGroup.POST("/create", api.CreateCrendentials)
+				credentialGroup.POST("/fields", api.AddFields)
 			}
 
 			teamGroup := organizationGroup.Group("/team")

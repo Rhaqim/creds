@@ -73,3 +73,42 @@ func GetCredential(c *gin.Context) {
 		"credential": resp,
 	})
 }
+
+func AddFields(c *gin.Context) {
+	var req []models.CredentialField
+	var cred models.Credential
+
+	user, err := GetUserFromToken(c)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	id := c.Param("credId")
+
+	if err := c.Bind(&req); err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error":   err.Error(),
+			"message": "Invalid request body.",
+		})
+
+		return
+	}
+
+	if err := cred.AddFields(user, req, id); err != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"error":   err.Error(),
+			"message": "Error adding fields.",
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message":    "Fields added successfully",
+		"credential": req,
+	})
+}
