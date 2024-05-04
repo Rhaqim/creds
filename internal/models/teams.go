@@ -18,7 +18,7 @@ type OrganizationTeam struct {
 	gorm.Model
 	Name           string     `json:"name" form:"name" query:"name" gorm:"not null" binding:"required"`
 	ManagerID      uint       `json:"manager_id" form:"manager_id" query:"manager_id"`
-	CreatedByID    uint       `json:"created_by_id" form:"created_by_id" query:"created_by_id" gorm:"not null" binding:"required"`
+	CreatedByID    uint       `json:"created_by_id" form:"created_by_id" query:"created_by_id" gorm:"not null"`
 	OrganizationID uint       `json:"organization_id" form:"organization_id" query:"organization_id" gorm:"not null" binding:"required"`
 	Privileges     Privileges `json:"privileges" form:"privileges" query:"privileges" gorm:"not null" oneof:"manage read"`
 }
@@ -42,6 +42,10 @@ func (O OrganizationTeam) GetMultipleByOrgID(orgID uint) ([]OrganizationTeam, er
 	var orgs []OrganizationTeam
 	err := database.DB.Where("organization_id = ?", orgID).Find(&orgs).Error
 	return orgs, err
+}
+func (O OrganizationTeam) GetMultipleByOrgIDName(orgID uint, name string) error {
+	err := database.DB.Where("organization_id = ? AND name = ?", orgID, name).First(&O).Error
+	return err
 }
 
 // Update updates an organization.
@@ -74,8 +78,7 @@ func (O *OrganizationTeam) CreateTeam(user User) error {
 	}
 
 	// Check if the team exists
-	var team OrganizationTeam
-	if err := database.DB.Where("organization_id = ? AND name = ?", O.OrganizationID, O.Name).First(&team).Error; err == nil {
+	if err := O.GetMultipleByOrgIDName(org.ID, O.Name); err == nil {
 		return errors.New("team already exists")
 	}
 
@@ -83,7 +86,7 @@ func (O *OrganizationTeam) CreateTeam(user User) error {
 	O.CreatedByID = user.ID
 	O.Privileges = ReadPrivilege
 
-	if err := team.Insert(); err != nil {
+	if err := O.Insert(); err != nil {
 		return err
 	}
 
@@ -115,7 +118,7 @@ type OrganizationMember struct {
 	UserID         uint                      `json:"user_id" form:"user_id" query:"user_id" gorm:"not null" binding:"required"`
 	Role           OrganaizationMemberRole   `json:"role" form:"role" query:"role" gorm:"not null" binding:"oneof=admin member"`
 	TeamID         uint                      `json:"team_id" form:"team_id" query:"team_id"`
-	Status         OrganaizationMemberStatus `json:"status" form:"status" query:"status" gorm:"not null" binding:"oneof=pending active inactive"`
+	Status         OrganaizationMemberStatus `json:"status" form:"status" query:"status" binding:"oneof=pending active inactive" default:"pending"`
 }
 
 // Insert creates a new organization.
@@ -183,7 +186,7 @@ func (O *OrganizationMember) InviteMember(user User, email string) error {
 	// Check if the user is already a member
 	var member OrganizationMember
 	if err := database.DB.Where("organization_id = ? AND user_id = ?", org.ID, usr.ID).First(&member).Error; err == nil {
-		return errors.New("User is already a member")
+		return errors.New("user is already a member")
 	}
 
 	// Create the member
