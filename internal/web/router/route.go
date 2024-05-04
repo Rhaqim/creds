@@ -44,7 +44,7 @@ func Init() error {
 			organizationGroup.GET("/:orgId", api.GetOrganization)
 			organizationGroup.POST("/create", api.CreateOrganization)
 
-			credentialGroup := organizationGroup.Group("/credentials")
+			credentialGroup := organizationGroup.Group("/credential")
 			{
 				// credentialGroup.GET("", api.CreateCrendentials)
 				credentialGroup.GET("/:credId", api.GetCredential)
@@ -57,6 +57,8 @@ func Init() error {
 			{
 				teamGroup.GET("", api.GetMembers)
 				teamGroup.GET("/:memId", api.GetMember)
+				teamGroup.POST("/create", api.CreateTeam)
+				teamGroup.POST("/invite", api.InviteMember)
 				teamGroup.POST("/add", api.CreateCrendentials)
 			}
 		}

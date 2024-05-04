@@ -26,10 +26,12 @@ type Organization struct {
 
 type OrganizationReturn struct {
 	Organization
-	MembersUser      []User       `json:"members_user"`
-	MembersCount     int          `json:"members_count"`
-	Credentials      []Credential `json:"credentials"`
-	CredentialsCount int          `json:"credentials_count"`
+	MembersUser      []User             `json:"members_user"`
+	MembersCount     int                `json:"members_count"`
+	Credentials      []Credential       `json:"credentials"`
+	CredentialsCount int                `json:"credentials_count"`
+	Teams            []OrganizationTeam `json:"teams"`
+	TeamsCount       int                `json:"teams_count"`
 }
 
 // Insert creates a new organization.
@@ -160,6 +162,7 @@ func (O *Organization) FetchOrganization(user User, id string) (OrganizationRetu
 	var cred Credential
 	var creds []Credential
 	var resp OrganizationReturn
+	var team OrganizationTeam
 
 	// convert id to uint
 	orgId, err := strconv.ParseUint(id, 10, 64)
@@ -189,6 +192,12 @@ func (O *Organization) FetchOrganization(user User, id string) (OrganizationRetu
 		return resp, err
 	}
 
+	// Fetch teams
+	teams, err := team.GetMultipleByOrgID(O.ID)
+	if err != nil {
+		return resp, err
+	}
+
 	// Prepare response
 	resp = OrganizationReturn{
 		Organization:     *O,
@@ -196,6 +205,8 @@ func (O *Organization) FetchOrganization(user User, id string) (OrganizationRetu
 		MembersUser:      membersUser,
 		Credentials:      creds,
 		CredentialsCount: len(creds),
+		Teams:            teams,
+		TeamsCount:       len(teams),
 	}
 
 	return resp, err

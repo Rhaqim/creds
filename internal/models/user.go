@@ -63,8 +63,3 @@ func (O *User) Update() error {
 func (O *User) Delete() error {
 	return database.DB.Delete(O).Error
 }
-
-// Register creates a new user.
-func (O *User) Register(user User) error {
-	return database.DB.Model(O).Create(O).Error
-}

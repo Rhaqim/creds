@@ -7,6 +7,7 @@ import (
 
 	"github.com/Rhaqim/creds/internal/config"
 	"github.com/Rhaqim/creds/internal/models"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -111,13 +112,13 @@ func (OA *OAuth2) UserExistsHandler(c *gin.Context, userInfo map[string]interfac
 	// Get User
 	err = user.GetByEmail(email)
 	if err != nil {
-		if err.Error() == "record not found" {
+		if err == gorm.ErrRecordNotFound {
 			// Create new user
 			user.Email = email
 			user.DisplayName = name
 			user.OAuthID = oauthID
 
-			err := user.Register(user)
+			err := user.Insert()
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 					"message": "Error creating user",
