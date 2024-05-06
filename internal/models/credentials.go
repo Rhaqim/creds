@@ -30,10 +30,10 @@ type Credential struct {
 
 type CredentialField struct {
 	gorm.Model
-	CredentialID     uint   `json:"creds_id" form:"creds_id" query:"creds_id" gorm:"not null"`
-	CredentialFileID uint   `json:"file_id" form:"file_id" query:"file_id"`
-	Key              string `json:"key" form:"key" query:"key" gorm:"not null"`
-	Value            string `json:"value" form:"value" query:"value" gorm:"not null"`
+	CredentialID     uint   `json:"creds_id,omitempty" form:"creds_id,omitempty" query:"creds_id,omitempty" gorm:"not null"`
+	CredentialFileID uint   `json:"file_id,omitempty" form:"file_id,omitempty" query:"file_id,omitempty"`
+	Key              string `json:"key" form:"key" query:"key" gorm:"not null" binding:"required"`
+	Value            string `json:"value" form:"value" query:"value" gorm:"not null" binding:"required"`
 }
 
 type CredentialReturn struct {

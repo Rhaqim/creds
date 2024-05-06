@@ -109,6 +109,8 @@ func (O *Organization) FetchOrganizations(user User) ([]OrganizationReturn, erro
 	var orgs []Organization
 	var cred Credential
 	var creds []Credential
+	var team OrganizationTeam
+	var teams []OrganizationTeam
 
 	// Fetch organizations
 	orgs, err = O.GetMultipleByUserID(user.ID)
@@ -122,6 +124,12 @@ func (O *Organization) FetchOrganizations(user User) ([]OrganizationReturn, erro
 		if err != nil {
 			return resp, err
 		}
+
+		// Fetch teams
+		teams, err = team.GetMultipleByOrgID(org.ID)
+		if err != nil {
+			return resp, err
+		}
 	}
 
 	// Prepare response
@@ -131,6 +139,8 @@ func (O *Organization) FetchOrganizations(user User) ([]OrganizationReturn, erro
 			MembersCount:     len(org.Members),
 			Credentials:      creds,
 			CredentialsCount: len(creds),
+			Teams:            teams,
+			TeamsCount:       len(teams),
 		})
 	}
 
