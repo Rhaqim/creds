@@ -7,11 +7,12 @@ import (
 
 type Resource struct {
 	gorm.Model
-	Name        string `json:"name" form:"name" query:"name" gorm:"not null" binding:"required"`
-	Description string `json:"description" form:"description" query:"description"`
-	URL         string `json:"url" form:"url" query:"url"`
-	Category    string `json:"category" form:"category" query:"category" gorm:"not null" binding:"required"`
-	Guide       string `json:"guide" form:"guide" query:"guide"`
+	OrganizationID uint   `json:"organization_id" form:"organization_id" query:"organizaiton_id"`
+	Name           string `json:"name" form:"name" query:"name" gorm:"not null" binding:"required"`
+	Description    string `json:"description" form:"description" query:"description"`
+	URL            string `json:"url" form:"url" query:"url"`
+	Category       string `json:"category" form:"category" query:"category" gorm:"not null" binding:"required"`
+	Guide          string `json:"guide" form:"guide" query:"guide"`
 }
 
 func (O *Resource) Insert() error {
