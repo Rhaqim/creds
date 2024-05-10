@@ -17,6 +17,7 @@ func GetUserFromToken(c *gin.Context) (models.User, error) {
 
 	return user, nil
 }
+
 func LoginHandler(c *gin.Context) {
 	// Retrieve the dynamic value from the context
 	provider := c.Param("provider")
