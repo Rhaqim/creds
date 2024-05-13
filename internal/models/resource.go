@@ -27,9 +27,9 @@ func (O *Resource) GetByID(id int) error {
 	return O.GetResource().Where("id = ?", id).First(O).Error
 }
 
-func (O Resource) GetMultipleByCredentialID(credentialID int) ([]Resource, error) {
+func (O Resource) GetMultipleByOrgID(organizationID int) ([]Resource, error) {
 	var orgs []Resource
-	err := O.GetResource().Where("credential_id = ?", credentialID).Find(&orgs).Error
+	err := O.GetResource().Where("organization_id = ?", organizationID).Find(&orgs).Error
 	return orgs, err
 }
 
